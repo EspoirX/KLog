@@ -1,0 +1,3 @@
+rootProject.name = "log"
+include(":app")
+include(":klog")
