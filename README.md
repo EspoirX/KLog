@@ -1,2 +1,67 @@
 # KLog
 基于xlog修改的本地日志库
+
+默认无加密，封装了日志相关的工具方法，方便快捷。兼容性好，不会像xlog那样有些手机打开就崩，谁用谁知道。
+
+## 引入
+
+```gradle
+allprojects {
+  repositories {
+    maven { url 'https://jitpack.io' }
+  }
+}
+
+dependencies {
+    implementation 'com.github.EspoirX:KLog:v1.0.0'
+}
+```
+
+## 初始化
+
+调用 LogService 相关的类进行初始化：
+
+``` kotlin
+val logService = LogService()
+
+fun init(application: Application) {
+    RuntimeInfo.sAppContext = application
+    logService.config()
+        .processTag(BuildConfig.NAME)
+        .logPath(getLogPath())
+        .apply()
+    logService.init()
+}
+
+private fun getLogPath(): String {
+    return StorageUtils.getCacheDir(RuntimeInfo.sAppContext, "logs")
+}
+```
+
+processTag 是log 文件的前缀，可以不填， logPath 是 log 文件的本地路径。
+
+## 生成日志压缩包
+
+提供了一个方便的方法生成日志压缩包，可以直接用来上传之类的操作：
+
+```kotlin
+fun submitLog() {
+    MainScope().launch(Dispatchers.IO) {
+        logService.submitLog(listener = object : OnSubmitLogListener {
+            override fun onSubmitLog(zipFilePath: String) {
+               //zipFilePath 是文件压缩包
+            }
+        })
+    }
+}
+```
+
+也可以自己操作，具体方法在 LogService 类中
+
+## log 工具类
+工具类是 KLog，使用方法和平常的 Log 使用无区别:
+
+```kotlin
+KLog.i("TAG", "我是log。。。")
+```
+
