@@ -5,9 +5,11 @@ import com.lzx.klog.api.IKLogFlush
 import com.lzx.klog.api.ILogConfig
 import com.lzx.klog.api.ILogService
 import com.lzx.klog.api.KLog
+import com.lzx.klog.api.OnSubmitLogListener
 import com.lzx.klog.impl.LogConfig
 import com.lzx.klog.util.LogManager
 import com.lzx.klog.util.TimeComparator
+import com.lzx.klog.util.submit.SubmitUtils
 import com.lzx.klog.writer.FileWriter
 import java.io.File
 import java.util.Arrays
@@ -117,5 +119,16 @@ class LogService : ILogService {
             }
         })
         if (locked.get()) LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(milliseconds))
+    }
+
+
+    override fun submitLog(fileNum: Int, endTime: String, listener: OnSubmitLogListener?) {
+        val latestNLogsZip = SubmitUtils.getLatestNLogsZip(this, fileNum, endTime)
+        flushBlocking(1000) //阻断刷新日志
+        flush(object : IKLogFlush {  //上报前先刷新
+            override fun callback(finish: Boolean) {
+                SubmitUtils.submitFeedback(latestNLogsZip, listener)
+            }
+        })
     }
 }

@@ -46,4 +46,19 @@ interface ILogService {
      * 同步阻塞等待flush执行完毕
      */
     fun flushBlocking(milliseconds: Long)
+
+
+    /**
+     * 提交日志
+     * fileNum:提交日期数量，默认7
+     * endTime:提交指定日期日志，格式 yyyy_MM_dd
+     */
+    fun submitLog(fileNum: Int = 7, endTime: String = "", listener: OnSubmitLogListener?)
+}
+
+interface OnSubmitLogListener {
+    /**
+     * zipFilePath 日志压缩包路径
+     */
+    fun onSubmitLog(zipFilePath: String)
 }
