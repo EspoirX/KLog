@@ -65,3 +65,8 @@ fun submitLog() {
 KLog.i("TAG", "我是log。。。")
 ```
 
+ 下面是日志文件的一些截图，乱码是因为我编码有问题，遇到这种情况可以用vs code 这种编辑器查看，一样的
+
+ <a href="https://sm.ms/image/1esoSCLiQBt5cTX" target="_blank"><img src="https://s2.loli.net/2023/09/14/1esoSCLiQBt5cTX.png" ></a>
+<a href="https://sm.ms/image/7oCuBU4zMViyIJx" target="_blank"><img src="https://s2.loli.net/2023/09/14/7oCuBU4zMViyIJx.png" ></a>
+<a href="https://sm.ms/image/6H5nihYArwsoJuk" target="_blank"><img src="https://s2.loli.net/2023/09/14/6H5nihYArwsoJuk.png" ></a>
