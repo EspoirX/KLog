@@ -9,12 +9,14 @@ import android.util.Log
 object KLog {
 
     var mLogImpl: ILog? = null
+    var logBridge: ILogBridge? = null
 
     @JvmStatic
     fun v(tag: String, message: String) {
         if (mLogImpl == null) {
             Log.v(tag, message)
         }
+        logBridge?.v(tag, message)
         mLogImpl?.v(tag, message)
     }
 
@@ -23,6 +25,7 @@ object KLog {
         if (mLogImpl == null) {
             Log.i(tag, message)
         }
+        logBridge?.i(tag, message)
         mLogImpl?.i(tag, message)
     }
 
@@ -32,6 +35,7 @@ object KLog {
         if (mLogImpl == null) {
             Log.d(tag, message)
         }
+        logBridge?.d(tag, message)
         mLogImpl?.d(tag, message)
     }
 
@@ -50,6 +54,7 @@ object KLog {
         if (mLogImpl == null) {
             Log.e(tag, message)
         }
+        logBridge?.e(tag, message)
         mLogImpl?.e(tag, message)
     }
 
