@@ -50,10 +50,11 @@ interface ILogService {
 
     /**
      * 提交日志
+     * fileName 默认 uuid的md5
      * fileNum:提交日期数量，默认7
      * endTime:提交指定日期日志，格式 yyyy_MM_dd
      */
-    fun submitLog(fileNum: Int = 7, endTime: String = "", listener: OnSubmitLogListener?)
+    fun submitLog(fileName: String?, fileNum: Int = 7, endTime: String = "", listener: OnSubmitLogListener?)
 }
 
 interface OnSubmitLogListener {

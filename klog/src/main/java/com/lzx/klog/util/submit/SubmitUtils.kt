@@ -148,9 +148,12 @@ object SubmitUtils {
         return sDumpDirectory
     }
 
-    fun submitFeedback(logList: MutableList<String>, listener: OnSubmitLogListener?) {
+    fun submitFeedback(fileName: String?,logList: MutableList<String>, listener: OnSubmitLogListener?) {
         var uuid = UUID.randomUUID().toString()
         uuid = Md5Util.getMD5(uuid)
+        if (!fileName.isNullOrEmpty()){
+            uuid = fileName
+        }
         val zipFilePath = (getDumpDirectory() + File.separator + uuid) + ".zip"
 
         val fileList = mutableListOf<String>()

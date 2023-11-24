@@ -122,12 +122,12 @@ class LogService : ILogService {
     }
 
 
-    override fun submitLog(fileNum: Int, endTime: String, listener: OnSubmitLogListener?) {
+    override fun submitLog(fileName: String?, fileNum: Int, endTime: String, listener: OnSubmitLogListener?) {
         val latestNLogsZip = SubmitUtils.getLatestNLogsZip(this, fileNum, endTime)
         flushBlocking(1000) //阻断刷新日志
         flush(object : IKLogFlush {  //上报前先刷新
             override fun callback(finish: Boolean) {
-                SubmitUtils.submitFeedback(latestNLogsZip, listener)
+                SubmitUtils.submitFeedback(fileName, latestNLogsZip, listener)
             }
         })
     }
