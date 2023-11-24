@@ -13,9 +13,10 @@ allprojects {
 }
 
 dependencies {
-    implementation 'com.github.EspoirX:KLog:v1.0.0'
+    implementation 'com.github.EspoirX:KLog:vX.X.X'
 }
 ```
+[![](https://jitpack.io/v/EspoirX/KLog.svg)](https://jitpack.io/#EspoirX/KLog)
 
 ## 初始化
 
