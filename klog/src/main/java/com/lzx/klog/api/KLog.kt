@@ -1,6 +1,9 @@
 package com.lzx.klog.api
 
-import android.util.Log
+import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONTokener
+import kotlin.math.min
 
 
 /**
@@ -8,139 +11,132 @@ import android.util.Log
  */
 object KLog {
 
+    enum class Type {
+        VERBOSE, DEBUG, INFO, WARN, ERROR
+    }
+
+    interface LogHook {
+        fun hook(type: Type = Type.INFO, tag: String, message: String)
+    }
+
     var mLogImpl: ILog? = null
-    var logBridge: ILogBridge? = null
+    val logHooks by lazy { ArrayList<LogHook>() }
 
-    val segmentSize = 3 * 1024
+    /**
+     * 添加日志拦截器
+     */
+    fun addHook(hook: LogHook) {
+        logHooks.add(hook)
+    }
 
+    /**
+     * 删除日志拦截器
+     */
+    fun removeHook(hook: LogHook) {
+        logHooks.remove(hook)
+    }
+
+    @JvmOverloads
     @JvmStatic
     fun v(tag: String, message: String) {
-        var copyMsg = message
-        val length = copyMsg.length
-        if (length <= segmentSize) {
-            realV(tag, copyMsg)
-        } else {
-            while (copyMsg.length > segmentSize) {
-                val subLog = copyMsg.substring(0, segmentSize)
-                copyMsg = copyMsg.replace(subLog, "")
-                realV(tag, subLog)
-            }
-            if (copyMsg.isNotEmpty()) {
-                realV(tag, copyMsg)
-            }
-        }
+        print(Type.VERBOSE, tag, message)
     }
 
-    private fun realV(tag: String, message: String) {
-        if (mLogImpl == null) {
-            Log.v(tag, message)
-        }
-        logBridge?.v(tag, message)
-        mLogImpl?.v(tag, message)
-    }
-
+    @JvmOverloads
     @JvmStatic
     fun i(tag: String, message: String) {
-        var copyMsg = message
-        val length = copyMsg.length
-        if (length <= segmentSize) {
-            realI(tag, copyMsg)
-        } else {
-            while (copyMsg.length > segmentSize) {
-                val subLog = copyMsg.substring(0, segmentSize)
-                copyMsg = copyMsg.replace(subLog, "")
-                realI(tag, subLog)
-            }
-            if (copyMsg.isNotEmpty()) {
-                realI(tag, copyMsg)
-            }
-        }
+        print(Type.INFO, tag, message)
     }
 
-    private fun realI(tag: String, message: String) {
-        if (mLogImpl == null) {
-            Log.i(tag, message)
-        }
-        logBridge?.i(tag, message)
-        mLogImpl?.i(tag, message)
-    }
-
-
+    @JvmOverloads
     @JvmStatic
     fun d(tag: String, message: String) {
-        var copyMsg = message
-        val length = copyMsg.length
-        if (length <= segmentSize) {
-            realD(tag, copyMsg)
-        } else {
-            while (copyMsg.length > segmentSize) {
-                val subLog = copyMsg.substring(0, segmentSize)
-                copyMsg = copyMsg.replace(subLog, "")
-                realD(tag, subLog)
-            }
-            if (copyMsg.isNotEmpty()) {
-                realD(tag, copyMsg)
-            }
-        }
+        print(Type.DEBUG, tag, message)
     }
 
-    private fun realD(tag: String, message: String) {
-        if (mLogImpl == null) {
-            Log.d(tag, message)
-        }
-        logBridge?.d(tag, message)
-        mLogImpl?.d(tag, message)
-    }
-
+    @JvmOverloads
     @JvmStatic
     fun w(tag: String, message: String) {
-        var copyMsg = message
-        val length = copyMsg.length
-        if (length <= segmentSize) {
-            realW(tag, copyMsg)
-        } else {
-            while (copyMsg.length > segmentSize) {
-                val subLog = copyMsg.substring(0, segmentSize)
-                copyMsg = copyMsg.replace(subLog, "")
-                realW(tag, subLog)
-            }
-            if (copyMsg.isNotEmpty()) {
-                realW(tag, copyMsg)
-            }
-        }
+        print(Type.WARN, tag, message)
     }
 
-    private fun realW(tag: String, message: String) {
-        if (mLogImpl == null) {
-            Log.w(tag, message)
-        }
-        logBridge?.w(tag, message)
-        mLogImpl?.w(tag, message)
-    }
-
+    @JvmOverloads
     @JvmStatic
     fun e(tag: String, message: String) {
-        var copyMsg = message
-        val length = copyMsg.length
-        if (length <= segmentSize) {
-            realE(tag, copyMsg)
+        print(Type.ERROR, tag, message)
+    }
+
+    @JvmOverloads
+    @JvmStatic
+    fun json(
+        json: String?,
+        tag: String,
+        msg: String = "",
+        type: Type = Type.INFO,
+    ) {
+        var message = json.toString()
+        if (message.isBlank()) {
+            print(type, tag, "$msg\n$message")
+            return
+        }
+        val tokener = JSONTokener(message)
+        val obj = try {
+            tokener.nextValue()
+        } catch (e: Exception) {
+            "Parse json error"
+        }
+        message = when (obj) {
+            is JSONObject -> obj.toString(2)
+            is JSONArray -> obj.toString(2)
+            else -> obj.toString()
+        }
+        print(type, tag, "$msg\n$message")
+    }
+
+    private fun print(type: Type = Type.INFO, tag: String, message: String) {
+        for (logHook in logHooks) {
+            logHook.hook(type, tag, message)
+        }
+        val max = 3800
+        val length = message.length
+        if (length > max) {
+            synchronized(this) {
+                var startIndex = 0
+                var endIndex = max
+                while (startIndex < length) {
+                    endIndex = min(length, endIndex)
+                    val substring = message.substring(startIndex, endIndex)
+                    log(type, tag, substring)
+                    startIndex += max
+                    endIndex += max
+                }
+            }
         } else {
-            while (copyMsg.length > segmentSize) {
-                val subLog = copyMsg.substring(0, segmentSize)
-                copyMsg = copyMsg.replace(subLog, "")
-                realE(tag, subLog)
-            }
-            if (copyMsg.isNotEmpty()) {
-                realE(tag, copyMsg)
-            }
+            log(type, tag, message)
         }
     }
 
-    private fun realE(tag: String, message: String) {
-        if (mLogImpl == null) {
-            Log.e(tag, message)
+    private fun log(type: Type, tag: String, msg: String) {
+        when (type) {
+            Type.VERBOSE -> {
+                mLogImpl?.v(tag, msg)
+            }
+
+            Type.DEBUG -> {
+                mLogImpl?.d(tag, msg)
+            }
+
+            Type.INFO -> {
+                mLogImpl?.i(tag, msg)
+            }
+
+            Type.WARN -> {
+                mLogImpl?.w(tag, msg)
+            }
+
+            Type.ERROR -> {
+                mLogImpl?.e(tag, msg)
+            }
         }
-        logBridge?.e(tag, message)
-        mLogImpl?.e(tag, message)
     }
 }
