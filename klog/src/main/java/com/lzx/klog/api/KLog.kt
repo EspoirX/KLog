@@ -19,6 +19,7 @@ object KLog {
         fun hook(type: Type = Type.INFO, tag: String, message: String)
     }
 
+    var enableWriteLogFile = true
     var mLogImpl: ILog? = null
     val logHooks by lazy { ArrayList<LogHook>() }
 

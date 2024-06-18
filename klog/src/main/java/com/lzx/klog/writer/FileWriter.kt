@@ -72,7 +72,7 @@ object FileWriter {
      * mmapDir一般定义在/data/data/xxx/files/log/里面
      */
     fun open(
-        logDir: String, mmapDir: String, namePrefix: String, logLevel: Int, publicKey: String, isCrypt: Boolean = false
+        logDir: String, mmapDir: String, namePrefix: String, logLevel: Int, publicKey: String, isCrypt: Boolean = false,
     ) {
         if (!mInited.get()) {
             return
@@ -159,7 +159,7 @@ object FileWriter {
         funcName: String,
         line: Int,
         tid: Long,
-        msg: String
+        msg: String,
     ) {
         if (!mInited.get()) {
             return
@@ -177,7 +177,7 @@ object FileWriter {
         line: Int,
         tid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         if (!mInited.get()) {
             return
@@ -194,7 +194,7 @@ object FileWriter {
         funcName: String,
         line: Int,
         tid: Long,
-        msg: String
+        msg: String,
     ) {
         if (!mInited.get()) {
             return
@@ -212,7 +212,7 @@ object FileWriter {
         line: Int,
         tid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         if (!mInited.get()) {
             return
@@ -229,7 +229,7 @@ object FileWriter {
         funcName: String,
         line: Int,
         tid: Long,
-        msg: String
+        msg: String,
     ) {
         if (!mInited.get()) {
             return
@@ -247,7 +247,7 @@ object FileWriter {
         line: Int,
         tid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         if (!mInited.get()) {
             return
@@ -264,7 +264,7 @@ object FileWriter {
         funcName: String,
         line: Int,
         tid: Long,
-        msg: String
+        msg: String,
     ) {
         if (!mInited.get()) {
             return
@@ -282,7 +282,7 @@ object FileWriter {
         line: Int,
         tid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         if (!mInited.get()) {
             return
@@ -299,7 +299,7 @@ object FileWriter {
         funcName: String,
         line: Int,
         tid: Long,
-        msg: String
+        msg: String,
     ) {
         if (!mInited.get()) {
             return
@@ -317,7 +317,7 @@ object FileWriter {
         line: Int,
         tid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         if (!mInited.get()) {
             return
@@ -337,8 +337,9 @@ object FileWriter {
         pid: Int,
         tid: Long,
         maintid: Long,
-        msg: String
+        msg: String,
     ) {
+        if (!KLog.enableWriteLogFile) return
         postMessage(BundleMessage.obtain().apply {
             what = WRITE
             this.level = level
@@ -364,8 +365,9 @@ object FileWriter {
         tid: Long,
         maintid: Long,
         format: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
+        if (!KLog.enableWriteLogFile) return
         postMessage(BundleMessage.obtain().apply {
             what = WRITE
             this.level = level
